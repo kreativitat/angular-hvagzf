@@ -1,0 +1,115 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<!--Import Google Icon Font-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<!--Let browser know website is optimized for mobile-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+
+<script type="text/javascript">
+ //Adiciona linha à tabela
+ $(document).ready(function(){ 
+   $('input[name="fieldname[]"]').focus(); //Após carregar em enter envia o cursos para o proximo field do cb
+   var wrapper = $('.field_wrapper'); //Input field wrapper
+   var x = 1; //Initial field counter is 1
+   var name; //Codigo de barras
+   var listaPesos = [];
+   //Once add button is clicked
+   $(document).on("keypress", function(e){ 
+     if(e.which == 13){ //Tecla enter
+       x = x + 1;
+       var part1 = '<tr class="tr_input"><th><input type="text" class="fieldname" name="fieldname[]" value="" id="fieldname_';
+       var part2 = '"/></th><th><input type="text" class="total" name="total[]" value="" id="total_';
+       var part3 = '"/></th><th style="float:right"><a href="javascript:void(0);" class="remove_button"><i class="small material-icons">indeterminate_check_box</i></a></th></tr>';
+       var fieldHTML = part1 + x + part2 + x + part3
+       //Obtem o valor do codigo de barras da linha
+       var closestParent = $('#table tr:last')//get the values relative to the parent
+       var namef = closestParent.find('.fieldname').val();
+       var etiqForn = namef.substring(0,10);
+       console.log("etiqForn: " + etiqForn);
+       //Pesos empresa Carsiva
+       var carsiva = ["0195602827",20,26], meatradind = ["0195600757",21,27], idFornecedor = [];
+       //console.log("carsiva: " + carsiva[0]);
+       //console.log("Logic: " + (etiqForn == carsiva[0] || etiqForn == meatradind[0]));
+       if (etiqForn == carsiva[0] || etiqForn == meatradind[0]) {
+         switch (etiqForn) {
+           case "0195602827":
+             idFornecedor = carsiva;
+             console.log("idFornecedor: " + idFornecedor);
+             break;
+           case "0195600757":
+             idFornecedor = meatradind;
+             console.log("idFornecedor: " + idFornecedor);
+             break;
+         }
+         var pesoInicio = idFornecedor[1];
+         var pesoFim = idFornecedor[2];
+         var pesoA = namef.substring(pesoInicio,pesoFim);
+         var pesoU = parseInt(namef.substring(pesoInicio,pesoFim))/1000;
+         var totalf = closestParent.find('.total').val(pesoU.toFixed(3)); //Coloca pesos na tabela
+         listaPesos.push(pesoU);
+         var somaPesos = listaPesos.reduce(function(a, b){
+         return a + b;
+         }, 0).toFixed(3);
+         $('#totalPeso').val(somaPesos);
+         $(wrapper).append(fieldHTML); //Add field html
+         $('input[name="fieldname[]"]').focus(); //Após carregar em enter envia o cursos para o proximo field do cb
+       }
+       else {
+         closestParent.find('.fieldname').val("");
+         //$(this).find('#fieldname_'+x).val("");
+         $('input[name="fieldname[]"]').focus(); //Após carregar em enter envia o cursos para o proximo field do cb
+         x = x - 1
+         var testFieldnameID = closestParent.find('.fieldname').val();
+       }
+       
+       
+       
+     }
+   });
+   //Once remove button is clicked
+   $(wrapper).on('click', '.remove_button', function(e){
+     e.preventDefault();
+     var index0 = $(this).closest('tr').find('.fieldname').attr('id');
+     var indexInicial = index0.substring(index0.indexOf("_") + 1)-1;
+     listaPesos.splice(indexInicial, 1, 0);
+     $(this).closest('tr').remove(); //Remove field html
+     var somaPesos = listaPesos.reduce(function(a, b){
+        return a + b;
+       }, 0).toFixed(2);
+     $('#totalPeso').val(somaPesos);
+     console.log(index0);
+     console.log("lista pesos apaga: " + listaPesos);
+   });
+
+   $(wrapper).on('click', '.del_button', function(e){
+     e.preventDefault();
+     listaPesos.splice(0, 1, 0);
+     //$(this).closest('tr').remove(); //Remove field html
+     var somaPesos = listaPesos.reduce(function(a, b){
+        return a + b;
+       }, 0).toFixed(2);
+     $('#totalPeso').val(somaPesos);
+     $('#total_1').val("");
+     $('#fieldname_1').val("");
+   });
+
+ });
+ 
+ ///////
+ window.onscroll = function() {myFunction()};
+
+var header = document.getElementById("myHeader");
+var sticky = header.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset > sticky) {
+    header.classList.add("sticky");
+  } else {
+    header.classList.remove("sticky");
+  }
+}
+</script>
